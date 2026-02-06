@@ -1,0 +1,10 @@
+<h3>Send Invitation to {{ guest.full_name }}</h3>
+
+<form method="post">
+  {% csrf_token %}
+  <select name="via">
+    <option value="email">Email</option>
+    <option value="whatsapp">WhatsApp</option>
+  </select>
+  <button type="submit">Send</button>
+</form>

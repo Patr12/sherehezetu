@@ -1,0 +1,562 @@
+<!-- events/templates/events/batch_add_guests.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Add Multiple Guests - InvitePro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .method-card {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .method-card:hover, .method-card.active {
+        border-color: #667eea;
+        background-color: #f0f2ff;
+    }
+    
+    .method-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: white;
+    }
+    
+    .method-manual { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .method-csv { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .method-excel { background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%); }
+    .method-text { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    
+    .input-section {
+        display: none;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    .input-section.active {
+        display: block;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .example-box {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        border-radius: 0 5px 5px 0;
+        margin-bottom: 20px;
+    }
+    
+    .file-upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        background: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .file-upload-area:hover {
+        border-color: #667eea;
+        background: #f0f2ff;
+    }
+    
+    .preview-table {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'event_list' %}">Events</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add Multiple Guests</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i> Add Multiple Guests
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="batchForm">
+                        {% csrf_token %}
+                        
+                        <!-- Event Selection -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">1. Select Event</h5>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    {{ form.event.errors }}
+                                    {{ form.event }}
+                                    <div class="form-text">
+                                        Choose the event to add guests to
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Input Method Selection -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">2. Choose Input Method</h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="method-card" data-method="manual">
+                                        <div class="method-icon method-manual">
+                                            <i class="fas fa-keyboard"></i>
+                                        </div>
+                                        <h6>Manual Entry</h6>
+                                        <p class="small text-muted">Enter guest details manually</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <div class="method-card" data-method="csv">
+                                        <div class="method-icon method-csv">
+                                            <i class="fas fa-file-csv"></i>
+                                        </div>
+                                        <h6>Upload CSV</h6>
+                                        <p class="small text-muted">Upload CSV file with guest data</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <div class="method-card" data-method="excel">
+                                        <div class="method-icon method-excel">
+                                            <i class="fas fa-file-excel"></i>
+                                        </div>
+                                        <h6>Upload Excel</h6>
+                                        <p class="small text-muted">Upload Excel file (XLS/XLSX)</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <div class="method-card" data-method="text">
+                                        <div class="method-icon method-text">
+                                            <i class="fas fa-paste"></i>
+                                        </div>
+                                        <h6>Paste Text</h6>
+                                        <p class="small text-muted">Copy-paste from spreadsheet</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden input for method selection -->
+                            <input type="hidden" name="input_method" id="inputMethod" value="manual">
+                        </div>
+                        
+                        <!-- Manual Input Section -->
+                        <div class="input-section active" id="manualSection">
+                            <h5 class="mb-3">3. Enter Guest Details</h5>
+                            
+                            <div class="example-box mb-3">
+                                <h6><i class="fas fa-lightbulb me-2"></i> Format Example:</h6>
+                                <pre class="mb-0 bg-white p-3 rounded">title,full_name,email,phone
+Mr,John Doe,john@example.com,0712345678
+Mrs,Jane Smith,jane@example.com,0723456789
+Dr,Michael Brown,michael@example.com,0734567890</pre>
+                            </div>
+                            
+                            {{ form.guest_data.errors }}
+                            {{ form.guest_data }}
+                            <div class="form-text">
+                                Enter one guest per line. Separate fields with commas. Required: title, full_name, email, phone
+                            </div>
+                            
+                            <!-- Guest Preview -->
+                            <div class="mt-4" id="manualPreview" style="display: none;">
+                                <h6>Preview (First 5 guests):</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm preview-table">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Full Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="previewBody">
+                                            <!-- Preview will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="alert alert-info small">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <span id="previewCount">0</span> guests detected
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- File Upload Section -->
+                        <div class="input-section" id="fileSection">
+                            <h5 class="mb-3">3. Upload File</h5>
+                            
+                            <div class="file-upload-area mb-3" id="fileDropArea">
+                                <div class="display-4 text-muted mb-3">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <h5>Drag & Drop File Here</h5>
+                                <p class="text-muted mb-3">or click to browse files</p>
+                                <button type="button" class="btn btn-outline-primary" id="browseBtn">
+                                    <i class="fas fa-folder-open me-2"></i> Browse Files
+                                </button>
+                                <div class="mt-3" id="selectedFile">
+                                    <span class="badge bg-success" id="fileName">No file selected</span>
+                                </div>
+                            </div>
+                            
+                            {{ form.guest_file.errors }}
+                            <input type="file" name="guest_file" id="guestFile" class="d-none" accept=".csv,.xlsx,.xls">
+                            
+                            <div class="example-box">
+                                <h6><i class="fas fa-info-circle me-2"></i> File Requirements:</h6>
+                                <ul class="mb-0">
+                                    <li>CSV or Excel format</li>
+                                    <li>Columns should include: <code>title</code>, <code>full_name</code>, <code>email</code>, <code>phone</code></li>
+                                    <li>Maximum file size: 10MB</li>
+                                    <li>Download <a href="#" id="downloadTemplate">template.csv</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Text Paste Section -->
+                        <div class="input-section" id="textSection">
+                            <h5 class="mb-3">3. Paste Guest Data</h5>
+                            
+                            <div class="example-box mb-3">
+                                <h6><i class="fas fa-clipboard me-2"></i> Copy from Spreadsheet:</h6>
+                                <ol class="mb-0">
+                                    <li>Select your guest data in Excel/Google Sheets</li>
+                                    <li>Copy (Ctrl+C)</li>
+                                    <li>Paste (Ctrl+V) in the box below</li>
+                                </ol>
+                            </div>
+                            
+                            <textarea name="guest_data" 
+                                      class="form-control" 
+                                      rows="10"
+                                      placeholder="Paste your guest data here..."></textarea>
+                            <div class="form-text">
+                                Paste data copied from spreadsheet. Each row should be one guest.
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="mt-4 pt-4 border-top">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{% url 'event_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i> Cancel
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                                        <i class="fas fa-user-plus me-2"></i> Add Guests
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Help Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i> Need Help?</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Required Fields:</h6>
+                            <ul class="mb-0">
+                                <li><strong>title</strong>: Mr, Mrs, Ms, Dr, etc.</li>
+                                <li><strong>full_name</strong>: Guest's full name</li>
+                                <li><strong>email</strong>: Email address (optional for WhatsApp)</li>
+                                <li><strong>phone</strong>: Phone number (optional for email)</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Tips:</h6>
+                            <ul class="mb-0">
+                                <li>At least email or phone is required for invitations</li>
+                                <li>You can add guests without contact info and update later</li>
+                                <li>Use the preview to verify your data before submitting</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elements
+    const methodCards = document.querySelectorAll('.method-card');
+    const inputMethod = document.getElementById('inputMethod');
+    const manualSection = document.getElementById('manualSection');
+    const fileSection = document.getElementById('fileSection');
+    const textSection = document.getElementById('textSection');
+    const guestDataTextarea = document.querySelector('textarea[name="guest_data"]');
+    const guestFileInput = document.getElementById('guestFile');
+    const browseBtn = document.getElementById('browseBtn');
+    const fileDropArea = document.getElementById('fileDropArea');
+    const fileName = document.getElementById('fileName');
+    const manualPreview = document.getElementById('manualPreview');
+    const previewBody = document.getElementById('previewBody');
+    const previewCount = document.getElementById('previewCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const downloadTemplate = document.getElementById('downloadTemplate');
+    
+    // Method selection
+    methodCards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove active class from all cards
+            methodCards.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked card
+            this.classList.add('active');
+            
+            // Get method value
+            const method = this.dataset.method;
+            inputMethod.value = method;
+            
+            // Show/hide sections
+            manualSection.classList.remove('active');
+            fileSection.classList.remove('active');
+            textSection.classList.remove('active');
+            
+            if (method === 'manual') {
+                manualSection.classList.add('active');
+            } else if (method === 'csv' || method === 'excel') {
+                fileSection.classList.add('active');
+                guestFileInput.accept = method === 'csv' ? '.csv' : '.xlsx,.xls';
+            } else if (method === 'text') {
+                textSection.classList.add('active');
+            }
+        });
+    });
+    
+    // Set first card as active by default
+    if (methodCards.length > 0) {
+        methodCards[0].click();
+    }
+    
+    // File upload handling
+    browseBtn.addEventListener('click', function() {
+        guestFileInput.click();
+    });
+    
+    guestFileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+            fileName.className = 'badge bg-success';
+        }
+    });
+    
+    // Drag and drop for files
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileDropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileDropArea.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileDropArea.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight() {
+        fileDropArea.style.borderColor = '#667eea';
+        fileDropArea.style.backgroundColor = '#f0f2ff';
+    }
+    
+    function unhighlight() {
+        fileDropArea.style.borderColor = '#dee2e6';
+        fileDropArea.style.backgroundColor = '#f8f9fa';
+    }
+    
+    fileDropArea.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            guestFileInput.files = files;
+            const file = files[0];
+            fileName.textContent = file.name + ' (' + formatFileSize(file.size) + ')';
+            fileName.className = 'badge bg-success';
+        }
+    });
+    
+    // Preview manual input
+    if (guestDataTextarea) {
+        guestDataTextarea.addEventListener('input', function() {
+            const text = this.value.trim();
+            
+            if (text) {
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                let guests = [];
+                
+                // Skip header if present
+                let startIndex = 0;
+                if (lines.length > 0) {
+                    const firstLine = lines[0].toLowerCase();
+                    if (firstLine.includes('title') || firstLine.includes('name') || firstLine.includes('email')) {
+                        startIndex = 1;
+                    }
+                }
+                
+                // Parse guests
+                for (let i = startIndex; i < lines.length; i++) {
+                    const parts = lines[i].split(',').map(part => part.trim());
+                    if (parts.length >= 2) {
+                        guests.push({
+                            title: parts[0] || 'Mr',
+                            full_name: parts[1] || '',
+                            email: parts[2] || '',
+                            phone: parts[3] || ''
+                        });
+                    }
+                }
+                
+                // Update preview
+                updatePreview(guests);
+                manualPreview.style.display = guests.length > 0 ? 'block' : 'none';
+            } else {
+                manualPreview.style.display = 'none';
+            }
+        });
+    }
+    
+    function updatePreview(guests) {
+        previewBody.innerHTML = '';
+        previewCount.textContent = guests.length;
+        
+        // Show max 5 guests in preview
+        const previewGuests = guests.slice(0, 5);
+        
+        previewGuests.forEach(guest => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${guest.title}</td>
+                <td>${guest.full_name}</td>
+                <td>${guest.email}</td>
+                <td>${guest.phone}</td>
+            `;
+            previewBody.appendChild(tr);
+        });
+        
+        // Enable/disable submit button
+        submitBtn.disabled = guests.length === 0;
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Template download
+    downloadTemplate.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Create CSV template
+        const csvContent = 'title,full_name,email,phone,notes\n' +
+                         'Mr,John Doe,john@example.com,0712345678,VIP Guest\n' +
+                         'Mrs,Jane Smith,jane@example.com,0723456789,Special requirements\n' +
+                         'Dr,Michael Brown,michael@example.com,0734567890,Speaker\n' +
+                         'Ms,Sarah Johnson,sarah@example.com,0745678901,\n' +
+                         'Mr,David Wilson,david@example.com,0756789012,Company CEO';
+        
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'guest_template.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+    
+    // Form validation
+    const form = document.getElementById('batchForm');
+    form.addEventListener('submit', function(e) {
+        const method = inputMethod.value;
+        const eventSelect = document.querySelector('select[name="event"]');
+        
+        // Validate event selection
+        if (!eventSelect.value) {
+            e.preventDefault();
+            alert('Please select an event');
+            eventSelect.focus();
+            return;
+        }
+        
+        // Validate based on method
+        if (method === 'manual' || method === 'text') {
+            const text = guestDataTextarea.value.trim();
+            if (!text) {
+                e.preventDefault();
+                alert('Please enter guest data');
+                guestDataTextarea.focus();
+                return;
+            }
+            
+            // Parse to check if we have valid data
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+            if (lines.length === 0) {
+                e.preventDefault();
+                alert('Please enter at least one guest');
+                return;
+            }
+            
+        } else if (method === 'csv' || method === 'excel') {
+            if (!guestFileInput.files.length) {
+                e.preventDefault();
+                alert('Please select a file to upload');
+                return;
+            }
+        }
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processing...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

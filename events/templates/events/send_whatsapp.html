@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Send WhatsApp Invitations - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="fas fa-paper-plane me-2"></i> WhatsApp Invitations for "{{ event.title }}"</h2>
+
+    {% if links %}
+        <div class="mb-3">
+            <button class="btn btn-primary" id="copyAll">
+                <i class="fas fa-copy me-1"></i> Copy All Links
+            </button>
+            <small class="text-muted ms-2">Paste these in WhatsApp Web or app to send</small>
+        </div>
+
+        <textarea id="allLinks" class="form-control mb-4" rows="10" readonly>{{ all_links_text }}</textarea>
+
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Guest Name</th>
+                    <th>WhatsApp Link</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in links %}
+                <tr>
+                    <td>{{ item.guest }}</td>
+                    <td><a href="{{ item.link }}" target="_blank">{{ item.link }}</a></td>
+                    <td><a href="{{ item.link }}" class="btn btn-success btn-sm" target="_blank">Send</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-muted">No guests with phone numbers available.</p>
+    {% endif %}
+</div>
+
+<script>
+    document.getElementById("copyAll").addEventListener("click", function() {
+        const allLinks = document.getElementById("allLinks");
+        allLinks.select();
+        allLinks.setSelectionRange(0, 99999); // Mobile devices
+        document.execCommand("copy");
+        alert("All WhatsApp links copied! Now paste in WhatsApp Web or app.");
+    });
+</script>
+{% endblock %}

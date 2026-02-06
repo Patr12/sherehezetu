@@ -1,0 +1,28 @@
+sherehezetu/
+├── manage.py
+├── requirements.txt
+├── sherehezetu/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── events/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── forms.py
+│   ├── utils.py
+│   ├── tasks.py
+│   ├── serializers.py
+│   ├── urls.py
+│   └── templates/
+│       └── events/
+│           ├── dashboard.html
+│           ├── event_list.html
+│           ├── guest_list.html
+│           └── email_invitation.html
+└── media/
+    ├── invitation_cards/
+    └── guest_qr_codes/

@@ -1,0 +1,548 @@
+{% extends 'base.html' %}
+
+{% block title %}InvitePro - Professional Invitation Cards System{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Home page specific overrides */
+    .navbar .nav-link.active {
+        background: var(--gradient);
+        color: white !important;
+    }
+    
+    /* Hero section adjustments */
+    .hero {
+        margin-top: 80px; /* Account for fixed navbar */
+    }
+</style>
+{% endblock %}
+
+{% block navbar %}
+<!-- Override navbar for home page -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Invite<span style="color: #3a0ca3;">Pro</span></span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#home">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#how-it-works">How It Works</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#pricing">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#testimonials">Testimonials</a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="{% url 'login' %}" class="btn-gradient">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content animate-on-scroll">
+                    <h1 class="animate__animated animate__fadeInUp">
+                        Create Stunning Invitation Cards with QR Codes
+                    </h1>
+                    <p class="animate__animated animate__fadeInUp animate__delay-1s">
+                        Professional invitation system for events, weddings, corporate functions, and more. 
+                        Automate your guest management, send personalized invitations via email & WhatsApp, 
+                        and track attendance with QR codes.
+                    </p>
+                    
+                    <div class="hero-btns">
+                        <a href="" class="btn-gradient animate__animated animate__fadeInUp animate__delay-2s">
+                            <i class="fas fa-rocket"></i> Start Free Trial
+                        </a>
+                        <a href="#features" class="btn-outline-gradient animate__animated animate__fadeInUp animate__delay-2s">
+                            <i class="fas fa-play-circle"></i> Watch Demo
+                        </a>
+                    </div>
+                    
+                    <div class="row mt-5 animate__animated animate__fadeInUp animate__delay-3s">
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-primary">10,000+</h3>
+                                <p class="text-muted">Invitations Sent</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-primary">500+</h3>
+                                <p class="text-muted">Happy Clients</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-primary">98%</h3>
+                                <p class="text-muted">Satisfaction Rate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="text-center animate-on-scroll">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="Invitation Cards" 
+                         class="img-fluid rounded shadow-lg animate__animated animate__zoomIn">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="section-title animate-on-scroll">
+            <h2>Powerful Features</h2>
+            <p>Everything you need to manage your events professionally</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <h3>QR Code Invitations</h3>
+                    <p>Each guest receives a unique QR code for easy check-in and attendance tracking. Real-time confirmation updates.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Multi-Channel Delivery</h3>
+                    <p>Send invitations via Email, WhatsApp, and SMS simultaneously. Automated follow-ups and reminders.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>Customizable Templates</h3>
+                    <p>Beautiful invitation templates with SVG support. Custom colors, fonts, and branding options.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Batch Guest Management</h3>
+                    <p>Upload guest lists via CSV/Excel. Manage hundreds of guests with ease. Import/export functionality.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Real-Time Analytics</h3>
+                    <p>Track invitation open rates, confirmations, and attendance. Detailed reports and insights.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-on-scroll">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Responsive</h3>
+                    <p>Access your dashboard from any device. QR code scanning app for easy check-in.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section id="how-it-works" class="py-5">
+    <div class="container py-5">
+        <div class="section-title animate-on-scroll">
+            <h2>How It Works in 4 Simple Steps</h2>
+            <p>Get started with InvitePro in minutes</p>
+        </div>
+        
+        <div class="steps-container">
+            <div class="step-line d-none d-lg-block"></div>
+            
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center animate-on-scroll">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                        </div>
+                        <h4>Create Event</h4>
+                        <p>Set up your event details, date, venue, and choose a beautiful template.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center animate-on-scroll">
+                        <div class="step">
+                            <div class="step-number">2</div>
+                        </div>
+                        <h4>Add Guests</h4>
+                        <p>Import your guest list or add guests individually with their contact details.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center animate-on-scroll">
+                        <div class="step">
+                            <div class="step-number">3</div>
+                        </div>
+                        <h4>Send Invitations</h4>
+                        <p>Send personalized invitations via email, WhatsApp, or SMS with one click.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="text-center animate-on-scroll">
+                        <div class="step">
+                            <div class="step-number">4</div>
+                        </div>
+                        <h4>Track & Manage</h4>
+                        <p>Monitor confirmations, check-in guests with QR codes, and generate reports.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5 animate-on-scroll">
+            <a href="" class="btn-gradient btn-lg">
+                <i class="fas fa-play-circle"></i> Start Your Free Trial
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="section-title animate-on-scroll">
+            <h2>Simple, Transparent Pricing</h2>
+            <p>Choose the perfect plan for your needs. No hidden fees, cancel anytime.</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card animate-on-scroll">
+                    <h3>Starter</h3>
+                    <p>Perfect for small events</p>
+                    <div class="price">
+                        TZS 99,000<span>/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Up to 100 guests</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Email invitations</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> QR code generation</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Basic templates</li>
+                        <li class="mb-2"><i class="fas fa-times text-muted me-2"></i> WhatsApp integration</li>
+                        <li class="mb-2"><i class="fas fa-times text-muted me-2"></i> Advanced analytics</li>
+                    </ul>
+                    <a href="" class="btn-gradient w-100">Get Started</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card popular animate-on-scroll">
+                    <div class="popular-badge">MOST POPULAR</div>
+                    <h3>Professional</h3>
+                    <p>Best for businesses</p>
+                    <div class="price">
+                        TZS 199,000<span>/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Up to 500 guests</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Email & WhatsApp</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Custom templates</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Batch guest import</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Advanced analytics</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Priority support</li>
+                    </ul>
+                    <a href="{% url 'signup' %}" class="btn-gradient w-100">Try Free for 14 Days</a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="pricing-card animate-on-scroll">
+                    <h3>Enterprise</h3>
+                    <p>For large organizations</p>
+                    <div class="price">
+                        Custom<span>/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Unlimited guests</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> All channels (Email, WhatsApp, SMS)</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> White-label solution</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> API access</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Dedicated account manager</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Custom development</li>
+                    </ul>
+                    <a href="#contact" class="btn-gradient w-100">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section id="testimonials" class="py-5">
+    <div class="container py-5">
+        <div class="section-title animate-on-scroll">
+            <h2>What Our Clients Say</h2>
+            <p>Join thousands of satisfied customers worldwide</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-content">
+                        <p>"InvitePro transformed how we manage our corporate events. The QR code check-in alone saved us hours!"</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" 
+                             alt="Client" 
+                             class="rounded-circle me-3" 
+                             width="60" 
+                             height="60">
+                        <div>
+                            <h5 class="mb-0">John Kamau</h5>
+                            <small class="text-muted">Event Manager, Corporate Solutions Ltd</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-content">
+                        <p>"Our wedding invitations were stunning! Guests loved the personalized QR codes and automated reminders."</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" 
+                             alt="Client" 
+                             class="rounded-circle me-3" 
+                             width="60" 
+                             height="60">
+                        <div>
+                            <h5 class="mb-0">Sarah Johnson</h5>
+                            <small class="text-muted">Bride & Event Planner</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="testimonial-card animate-on-scroll">
+                    <div class="testimonial-content">
+                        <p>"The batch import feature saved us so much time. Managing 500+ guests became effortless!"</p>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <img src="https://randomuser.me/api/portraits/men/65.jpg" 
+                             alt="Client" 
+                             class="rounded-circle me-3" 
+                             width="60" 
+                             height="60">
+                        <div>
+                            <h5 class="mb-0">David Mwangi</h5>
+                            <small class="text-muted">Conference Organizer, Tech Summit Africa</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="cta-bg"></div>
+    <div class="container position-relative">
+        <div class="animate-on-scroll">
+            <h2 class="text-white">Ready to Transform Your Event Management?</h2>
+            <p class="text-white">Join thousands of event organizers who trust InvitePro for their invitation needs. Start your free trial today - no credit card required!</p>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control form-control-lg" placeholder="Enter your email address">
+                        <button class="btn btn-light btn-lg" type="button" id="start-trial-btn">
+                            Start Free Trial <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                    <p class="text-white-50 small">Try free for 14 days • No credit card required • Cancel anytime</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}
+<!-- Override footer for home page -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <a class="navbar-brand text-white" href="{% url 'home' %}">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Invite<span style="color: #4cc9f0;">Pro</span></span>
+                </a>
+                <p class="mt-3 text-white-50">Professional invitation system for modern events. Create, send, and track invitations with ease.</p>
+                <div class="social-links mt-4">
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Product</h5>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Updates</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-2 col-md-6 mb-4">
+                <h5>Company</h5>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <h5>Contact Us</h5>
+                <ul class="footer-links">
+                    <li><i class="fas fa-map-marker-alt me-2"></i> Dar es Salaam, Tanzania</li>
+                    <li><i class="fas fa-phone me-2"></i> +255 123 456 789</li>
+                    <li><i class="fas fa-envelope me-2"></i> info@invitepro.co.tz</li>
+                    <li><i class="fas fa-clock me-2"></i> Mon-Fri 8:00 AM - 6:00 PM</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; {% now "Y" %} InvitePro. All rights reserved. | <a href="#" class="text-white-50">Privacy Policy</a> | <a href="#" class="text-white-50">Terms of Service</a></p>
+        </div>
+    </div>
+</footer>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Home page specific JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-typing effect for hero section
+        const heroText = document.querySelector('.hero h1');
+        if (heroText) {
+            const originalText = heroText.textContent;
+            heroText.textContent = '';
+            
+            let i = 0;
+            function typeWriter() {
+                if (i < originalText.length) {
+                    heroText.textContent += originalText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 50);
+                }
+            }
+            
+            // Start typing effect after 500ms
+            setTimeout(typeWriter, 500);
+        }
+        
+        // Newsletter form submission
+        const startTrialBtn = document.getElementById('start-trial-btn');
+        if (startTrialBtn) {
+            startTrialBtn.addEventListener('click', function() {
+                const emailInput = document.querySelector('.cta-section input[type="email"]');
+                const email = emailInput.value.trim();
+                
+                if (email && validateEmail(email)) {
+                    // Here you would typically send the email to your backend
+                    alert('Thank you! Your free trial request has been received. We\'ll contact you shortly.');
+                    emailInput.value = '';
+                    
+                    // Redirect to signup page
+                    window.location.href = "{% url 'signup' %}?email=" + encodeURIComponent(email);
+                } else {
+                    alert('Please enter a valid email address.');
+                    emailInput.focus();
+                }
+            });
+        }
+        
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Update active nav link on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

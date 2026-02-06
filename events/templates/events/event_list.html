@@ -1,0 +1,154 @@
+<!-- events/event_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Events - InvitePro{% endblock %}
+
+{% block extra_css %}
+<style>
+    .event-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        border: none;
+        margin-bottom: 20px;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .event-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+    }
+    
+    .event-stats {
+        display: flex;
+        justify-content: space-around;
+        background: #f8f9fa;
+        padding: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #667eea;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-calendar-alt me-2"></i> My Events</h1>
+    <a href="{% url 'event_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus-circle me-2"></i> Create New Event
+    </a>
+</div>
+
+<div class="row">
+    {% for event in events %}
+    <div class="col-lg-4 col-md-6">
+        <div class="event-card">
+            <div class="event-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">{{ event.title }}</h5>
+                        <p class="mb-0 small opacity-75">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ event.venue }}
+                        </p>
+                    </div>
+                    <span class="badge bg-light text-primary">
+                        {{ event.date|date:"M d" }}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <p class="card-text">{{ event.description|truncatechars:100 }}</p>
+                
+                <div class="event-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ event.guest_count|default:0 }}</div>
+                        <div class="stat-label">Guests</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ event.confirmed_count|default:0 }}</div>
+                        <div class="stat-label">Confirmed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ event.pending_count|default:0 }}</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-3">
+                    <a href="{% url 'event_detail' event.id %}" 
+                       class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-eye me-1"></i> View
+                    </a>
+                    <a href="{% url 'send_event_invitations' event.id %}" 
+                       class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-paper-plane me-1"></i> Invite
+                    </a>
+                    <a href="{% url 'event_guests' event.id %}" 
+                       class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-users me-1"></i> Guests
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+            <h3 class="text-muted">No events yet</h3>
+            <p class="text-muted mb-4">Create your first event to start inviting guests</p>
+            <a href="{% url 'event_create' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus-circle me-2"></i> Create Your First Event
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        </li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}
