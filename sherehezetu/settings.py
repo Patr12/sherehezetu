@@ -140,7 +140,7 @@ DOMAIN = "localhost:8000"  # au domain yako
 
 TWILIO_ACCOUNT_SID = "xxxx"
 TWILIO_AUTH_TOKEN = "xxxx"
-TWILIO_WHATSAPP_NUMBER = "whatsapp:+14155238886"
+TWILIO_WHATSAPP_NUMBER = "whatsapp:+255718486409"
 
 # URL ya login page
 LOGIN_URL = 'login'  # hii inamaanisha reverse('login') itumike

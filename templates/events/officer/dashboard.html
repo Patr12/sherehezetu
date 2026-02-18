@@ -1,0 +1,11 @@
+<h2>Officer Dashboard</h2>
+
+<ul>
+  {% for event in events %}
+    <li>
+      <a href="{% url 'officer_event_detail' event.id %}">
+        {{ event.title }} - {{ event.date }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>

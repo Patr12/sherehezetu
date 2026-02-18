@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Guest Check In{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Guest Check-In</h4>
+                </div>
+
+                <div class="card-body">
+                    <p><strong>Name:</strong> {{ guest.full_name }}</p>
+                    <p><strong>Email:</strong> {{ guest.email }}</p>
+                    <p><strong>Phone:</strong> {{ guest.phone }}</p>
+                    <p><strong>Status:</strong>
+                        {% if guest.confirmed %}
+                            <span class="badge bg-success">Already Checked In</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Not Checked In</span>
+                        {% endif %}
+                    </p>
+
+                    {% if not guest.confirmed %}
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success w-100">
+                                ✅ Confirm & Check In Guest
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'guest_detail' guest.id %}" class="btn btn-secondary w-100">
+                            ⬅ Back to Guest Details
+                        </a>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

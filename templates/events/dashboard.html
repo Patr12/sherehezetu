@@ -1,0 +1,609 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - InvitePro{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Additional styles specific to dashboard */
+    .dashboard-stat {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .dashboard-stat:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .stat-trend {
+        font-size: 0.8rem;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .trend-up {
+        color: #4ade80;
+    }
+    
+    .trend-down {
+        color: #f87171;
+    }
+    
+    .recent-activity-item {
+        padding: 12px 15px;
+        border-left: 3px solid #667eea;
+        background: #f8f9fa;
+        margin-bottom: 10px;
+        border-radius: 8px;
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+    
+    .activity-email { background: #3b82f6; }
+    .activity-whatsapp { background: #25D366; }
+    .activity-scan { background: #8b5cf6; }
+    .activity-confirm { background: #10b981; }
+    
+    /* Quick stats cards */
+    .quick-stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e5e7eb;
+    }
+    
+    .quick-stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header animate__animated animate__fadeIn">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1>
+                <i class="fas fa-tachometer-alt-alt text-primary me-2"></i>
+                Welcome back, {{ request.user.get_full_name|default:request.user.username }}!
+            </h1>
+            <p class="subtitle mb-0">
+                Here's what's happening with your invitation system today
+                <span id="current-time" class="badge bg-primary ms-2">
+                    <i class="fas fa-clock"></i> Loading...
+                </span>
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary pulse me-2" data-bs-toggle="modal" data-bs-target="#quickActionModal">
+                <i class="fas fa-bolt"></i> Quick Actions
+            </button>
+            <a href="{% url 'event_create' %}" class="btn btn-outline-primary">
+                <i class="fas fa-plus-circle"></i> New Event
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row animate__animated animate__fadeInUp">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="dashboard-stat" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="stat-number">{{ total_events }}</div>
+            <div class="stat-label">Total Events</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i>
+                {% if last_month_events %}
+                    {% widthratio total_events last_month_events 100 as growth %}
+                    {{ growth|add:"-100" }}% from last month
+                {% else %}
+                    New events
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="dashboard-stat" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="stat-number">{{ total_guests }}</div>
+            <div class="stat-label">Total Guests</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-arrow-up"></i>
+                {% if last_month_guests %}
+                    {% widthratio total_guests last_month_guests 100 as growth %}
+                    {{ growth|add:"-100" }}% from last month
+                {% else %}
+                    New guests
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="dashboard-stat" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <div class="stat-number">{{ confirmed_guests }}</div>
+            <div class="stat-label">Confirmed Guests</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-check-circle"></i>
+                {{ confirmation_rate }}% confirmation rate
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="dashboard-stat" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <div class="stat-number">{{ qr_scans }}</div>
+            <div class="stat-label">QR Code Scans</div>
+            <div class="stat-trend trend-up">
+                <i class="fas fa-qrcode"></i>
+                {% if today_sent > 0 %}
+                    {{ today_sent }} sent today
+                {% else %}
+                    No invitations sent today
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="quick-stat-card">
+            <div class="quick-stat-icon" style="background: #3b82f6;">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h5 class="mb-1">{{ today_sent }}</h5>
+            <p class="text-muted mb-0">Invitations Sent Today</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="quick-stat-card">
+            <div class="quick-stat-icon" style="background: #25D366;">
+                <i class="fab fa-whatsapp"></i>
+            </div>
+            <h5 class="mb-1">
+                {% for stat in channel_stats %}
+                    {% if stat.sent_via == 'whatsapp' %}
+                        {{ stat.count }}
+                    {% endif %}
+                {% endfor %}
+            </h5>
+            <p class="text-muted mb-0">WhatsApp Invitations</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="quick-stat-card">
+            <div class="quick-stat-icon" style="background: #8b5cf6;">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <h5 class="mb-1">{{ pending_guests }}</h5>
+            <p class="text-muted mb-0">Pending Responses</p>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="quick-stat-card">
+            <div class="quick-stat-icon" style="background: #10b981;">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h5 class="mb-1">{{ upcoming_events.count }}</h5>
+            <p class="text-muted mb-0">Upcoming Events</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column - 8 grid -->
+    <div class="col-lg-8">
+        <!-- Recent Events Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt text-primary me-2"></i> Recent Events</h5>
+                <a href="{% url 'event_list' %}" class="btn btn-sm btn-outline-primary">
+                    View All <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Event</th>
+                                <th>Date</th>
+                                <th>Guests</th>
+                                <th>Confirmed</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in recent_events %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="activity-icon" style="background: #667eea; width: 36px; height: 36px;">
+                                                <i class="fas fa-calendar text-white"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <strong>{{ event.title|truncatechars:30 }}</strong>
+                                            <small class="d-block text-muted">{{ event.venue|truncatechars:25 }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ event.date|date:"M d, Y" }}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">{{ event.date|time:"h:i A" }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary rounded-pill px-3">
+                                        {{ event.guest_count|default:0 }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                            {% if event.guest_count > 0 %}
+                                            {% widthratio event.confirmed_count|default:0 event.guest_count 100 as confirmed_pct %}
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: {{ confirmed_pct }}%"></div>
+                                            {% else %}
+                                            <div class="progress-bar bg-success" role="progressbar" 
+                                                 style="width: 0%"></div>
+                                            {% endif %}
+                                        </div>
+                                        <span class="small">{{ event.confirmed_count|default:0 }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'event_detail' event.id %}" 
+                                           class="btn btn-outline-primary btn-sm" 
+                                           title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'send_event_invitations' event.id %}" 
+                                           class="btn btn-outline-success btn-sm" 
+                                           title="Send Invitations">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </a>
+                                        <a href="{% url 'event_guests' event.id %}" 
+                                           class="btn btn-outline-info btn-sm" 
+                                           title="View Guests">
+                                            <i class="fas fa-users"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No events yet</h5>
+                                    <p class="text-muted mb-0">Create your first event to get started</p>
+                                    <a href="{% url 'event_create' %}" class="btn btn-primary mt-3">
+                                        <i class="fas fa-plus me-2"></i> Create First Event
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weekly Activity Chart -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-chart-line text-primary me-2"></i> Weekly Activity</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="weeklyActivityChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right Column - 4 grid -->
+    <div class="col-lg-4">
+        <!-- Recent Activity -->
+        <div class="card mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history text-primary me-2"></i> Recent Activity</h5>
+                <span class="badge bg-primary">{{ recent_activity.count }}</span>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                {% for activity in recent_activity %}
+                <div class="recent-activity-item mb-3">
+                    <div class="d-flex">
+                        <div class="activity-icon 
+                            {% if activity.sent_via == 'email' %}activity-email
+                            {% elif activity.sent_via == 'whatsapp' %}activity-whatsapp
+                            {% elif activity.sent_via == 'sms' %}activity-scan
+                            {% else %}activity-confirm{% endif %}">
+                            <i class="fas 
+                                {% if activity.sent_via == 'email' %}fa-envelope
+                                {% elif activity.sent_via == 'whatsapp' %}fa-whatsapp
+                                {% elif activity.sent_via == 'sms' %}fa-sms
+                                {% else %}fa-check{% endif %} text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                {% if activity.sent_via == 'email' %}
+                                    Email invitation sent
+                                {% elif activity.sent_via == 'whatsapp' %}
+                                    WhatsApp invitation sent
+                                {% elif activity.sent_via == 'sms' %}
+                                    SMS sent
+                                {% else %}
+                                    Manual invitation
+                                {% endif %}
+                            </h6>
+                            <p class="mb-1 small">
+                                To {{ activity.guest.full_name }}
+                                <br>
+                                <small class="text-muted">
+                                    Event: {{ activity.guest.event.title|truncatechars:20 }}
+                                </small>
+                            </p>
+                            <small class="text-muted">
+                                <i class="far fa-clock"></i> {{ activity.sent_at|timesince }} ago
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-bell-slash fa-2x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">No recent activity</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Upcoming Events -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-check text-success me-2"></i> Upcoming Events</h5>
+            </div>
+            <div class="card-body">
+                {% for event in upcoming_events %}
+                <div class="event-card mb-3">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="mb-0 text-primary">{{ event.title|truncatechars:25 }}</h6>
+                        <span class="badge bg-info">{{ event.date|date:"M d" }}</span>
+                    </div>
+                    <div class="d-flex align-items-center text-muted mb-2">
+                        <i class="fas fa-clock me-2"></i>
+                        <small>{{ event.date|time:"h:i A" }}</small>
+                        <i class="fas fa-map-marker-alt ms-3 me-2"></i>
+                        <small>{{ event.venue|truncatechars:20 }}</small>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small">
+                            <i class="fas fa-users me-1"></i>
+                            {{ event.guest_count|default:0 }} guests
+                        </span>
+                        <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary">
+                            View
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-plus fa-2x text-muted mb-3"></i>
+                    <p class="text-muted mb-2">No upcoming events</p>
+                    <a href="{% url 'event_create' %}" class="btn btn-sm btn-primary">
+                        Create Event
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Modal -->
+<div class="modal fade" id="quickActionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-bolt me-2"></i> Quick Actions</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'event_create' %}" class="card text-center h-100 text-decoration-none border-primary">
+                            <div class="card-body">
+                                <div class="display-1 text-primary mb-3">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <h5 class="card-title">Create Event</h5>
+                                <p class="card-text text-muted">Start a new event</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'batch_add_guests' %}" class="card text-center h-100 text-decoration-none border-success">
+                            <div class="card-body">
+                                <div class="display-1 text-success mb-3">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h5 class="card-title">Add Guests</h5>
+                                <p class="card-text text-muted">Add multiple guests</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" class="card text-center h-100 text-decoration-none border-info">
+                            <div class="card-body">
+                                <div class="display-1 text-info mb-3">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                                <h5 class="card-title">Send Invitations</h5>
+                                <p class="card-text text-muted">Send to all guests</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="#" class="card text-center h-100 text-decoration-none border-warning">
+                            <div class="card-body">
+                                <div class="display-1 text-warning mb-3">
+                                    <i class="fas fa-qrcode"></i>
+                                </div>
+                                <h5 class="card-title">Scan QR Code</h5>
+                                <p class="card-text text-muted">Check-in guests</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update current time
+    function updateCurrentTime() {
+        const now = new Date();
+        const options = { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        };
+        const timeStr = now.toLocaleDateString('en-US', options);
+        document.getElementById('current-time').innerHTML = 
+            `<i class="fas fa-clock"></i> ${timeStr}`;
+    }
+    
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    
+    // Weekly Activity Chart
+    const weeklyCtx = document.getElementById('weeklyActivityChart').getContext('2d');
+    const dailyData = JSON.parse('{{ daily_stats|safe|escapejs }}'.replace(/&#x27;/g, '"'));
+    
+    new Chart(weeklyCtx, {
+        type: 'bar',
+        data: {
+            labels: dailyData.map(d => d.date),
+            datasets: [
+                {
+                    label: 'Invitations Sent',
+                    data: dailyData.map(d => d.sent),
+                    backgroundColor: 'rgba(67, 97, 238, 0.7)',
+                    borderColor: 'rgba(67, 97, 238, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Confirmed',
+                    data: dailyData.map(d => d.confirmed),
+                    backgroundColor: 'rgba(76, 201, 240, 0.7)',
+                    borderColor: 'rgba(76, 201, 240, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Last 7 Days Activity'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+    
+    // Auto-refresh dashboard every 60 seconds
+    setTimeout(() => {
+        window.location.reload();
+    }, 60000);
+    
+    // Notification example
+    if ({{ today_sent }} > 0) {
+        showNotification(`🎉 ${ {{ today_sent }} } invitations sent today!`, 'success');
+    }
+    
+    // Function to show notification
+    function showNotification(message, type = 'info') {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <strong>${type === 'success' ? '🎉 ' : '📢 '}</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 5000);
+    }
+    
+    window.showNotification = showNotification;
+});
+</script>
+{% endblock %}

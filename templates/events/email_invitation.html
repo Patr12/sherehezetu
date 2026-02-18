@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invitation: {{ event.title }}</title>
+</head>
+<body>
+    <h2>Dear {{ guest.full_name }},</h2>
+    <p>You are invited to <strong>{{ event.title }}</strong>!</p>
+    <p>Date: {{ event.date|date:"d M Y" }}</p>
+    <p>Venue: {{ event.venue }}</p>
+    <p><a href="{{ confirm_url }}">Confirm your attendance</a></p>
+    <p>See you there!</p>
+</body>
+</html>

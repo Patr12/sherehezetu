@@ -1,0 +1,433 @@
+<!-- events/templates/events/guest_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ guest.full_name }} - Guest Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .guest-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .guest-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #667eea;
+        font-size: 2rem;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+    
+    .info-card {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .info-card-header {
+        background: #f8f9fa;
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        font-weight: 600;
+    }
+    
+    .info-card-body {
+        padding: 20px;
+    }
+    
+    .status-badge {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .action-buttons .btn {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    
+    .qr-container {
+        text-align: center;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'event_list' %}">Events</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'event_detail' event.id %}">{{ event.title|truncatechars:20 }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'event_guests' event.id %}">Guests</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ guest.full_name|truncatechars:20 }}</li>
+    </ol>
+</nav>
+
+<!-- Guest Header -->
+<div class="guest-header">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <div class="guest-avatar">
+                {{ guest.full_name|slice:":1"|upper }}
+            </div>
+        </div>
+        <div class="col">
+            <h1 class="h3 mb-2">{{ guest.full_name }}</h1>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-envelope me-1"></i> {{ guest.email }}
+                </span>
+                {% if guest.company %}
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-building me-1"></i> {{ guest.company }}
+                </span>
+                {% endif %}
+                {% if guest.phone %}
+                <span class="badge bg-light text-dark">
+                    <i class="fas fa-phone me-1"></i> {{ guest.phone }}
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-auto">
+            {% if guest.confirmed %}
+            <span class="status-badge bg-success bg-opacity-25 text-success border border-success">
+                <i class="fas fa-check-circle me-1"></i> CONFIRMED
+            </span>
+            {% else %}
+            <span class="status-badge bg-warning bg-opacity-25 text-warning border border-warning">
+                <i class="fas fa-clock me-1"></i> PENDING
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column - Guest Information -->
+    <div class="col-lg-8">
+        <!-- Contact Information -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-user-circle me-2"></i> Contact Information
+            </div>
+            <div class="info-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-envelope text-primary me-2"></i> Email Address</strong>
+                        <p class="mb-0">{{ guest.email }}</p>
+                        <small class="text-muted">Primary contact email</small>
+                    </div>
+                    
+                    {% if guest.phone %}
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-phone text-success me-2"></i> Phone Number</strong>
+                        <p class="mb-0">{{ guest.phone }}</p>
+                        <small class="text-muted">Mobile contact</small>
+                    </div>
+                    {% endif %}
+                    
+                    {% if guest.company %}
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-building text-info me-2"></i> Company/Organization</strong>
+                        <p class="mb-0">{{ guest.company }}</p>
+                        <small class="text-muted">Associated organization</small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-calendar-plus text-warning me-2"></i> Added On</strong>
+                        <p class="mb-0">{{ guest.created_at|date:"F d, Y" }}</p>
+                        <small class="text-muted">Date added to system</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Information -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-calendar-alt me-2"></i> Event Information
+            </div>
+            <div class="info-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-calendar text-primary me-2"></i> Event</strong>
+                        <p class="mb-0">{{ event.title }}</p>
+                        <a href="{% url 'event_detail' event.id %}" class="small">View event details</a>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-map-marker-alt text-danger me-2"></i> Venue</strong>
+                        <p class="mb-0">{{ event.venue }}</p>
+                        <small class="text-muted">Event location</small>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-clock text-warning me-2"></i> Date & Time</strong>
+                        <p class="mb-0">{{ event.date|date:"F d, Y" }} at {{ event.date|time:"h:i A" }}</p>
+                        <small class="text-muted">Event schedule</small>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <strong><i class="fas fa-users text-info me-2"></i> Guest Count</strong>
+                        <p class="mb-0">{{ event.guests.count }} guests</p>
+                        <a href="{% url 'event_guests' event.id %}" class="small">View all guests</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invitation Status -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-paper-plane me-2"></i> Invitation Status
+            </div>
+            <div class="info-card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="display-4 mb-2">
+                            {% if guest.invitation_sent %}
+                            <i class="fas fa-check-circle text-success"></i>
+                            {% else %}
+                            <i class="fas fa-times-circle text-danger"></i>
+                            {% endif %}
+                        </div>
+                        <h6>Invitation Sent</h6>
+                        <p class="small text-muted mb-0">
+                            {% if guest.invitation_sent %}
+                            Sent via {{ guest.get_invitation_via_display }}
+                            {% else %}
+                            Not sent yet
+                            {% endif %}
+                        </p>
+                        {% if guest.invitation_sent_at %}
+                        <small class="text-muted">{{ guest.invitation_sent_at|date:"M d, Y H:i" }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="display-4 mb-2">
+                            {% if guest.confirmed %}
+                            <i class="fas fa-check-circle text-success"></i>
+                            {% else %}
+                            <i class="fas fa-clock text-warning"></i>
+                            {% endif %}
+                        </div>
+                        <h6>Confirmation</h6>
+                        <p class="small text-muted mb-0">
+                            {% if guest.confirmed %}
+                            Confirmed attendance
+                            {% else %}
+                            Awaiting response
+                            {% endif %}
+                        </p>
+                        {% if guest.confirmed_at %}
+                        <small class="text-muted">Confirmed {{ guest.confirmed_at|date:"M d, Y" }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="display-4 mb-2">
+                            {% if guest.checked_in_at %}
+                            <i class="fas fa-check-circle text-success"></i>
+                            {% else %}
+                            <i class="fas fa-door-closed text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <h6>Check-in</h6>
+                        <p class="small text-muted mb-0">
+                            {% if guest.checked_in_at %}
+                            Checked in at event
+                            {% else %}
+                            Not checked in
+                            {% endif %}
+                        </p>
+                        {% if guest.checked_in_at %}
+                        <small class="text-muted">{{ guest.checked_in_at|date:"M d, Y H:i" }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invitation History -->
+        {% if invitation_history %}
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-history me-2"></i> Invitation History
+            </div>
+            <div class="info-card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Channel</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for history in invitation_history %}
+                            <tr>
+                                <td>{{ history.sent_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if history.sent_via == 'email' %}bg-primary
+                                        {% elif history.sent_via == 'whatsapp' %}bg-success
+                                        {% else %}bg-info{% endif %}">
+                                        {{ history.get_sent_via_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if history.status == 'sent' %}
+                                    <span class="badge bg-success">Sent</span>
+                                    {% elif history.status == 'failed' %}
+                                    <span class="badge bg-danger">Failed</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ history.notes|default:"-" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column - Actions & QR Code -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="info-card mb-4">
+            <div class="info-card-header">
+                <i class="fas fa-bolt me-2"></i> Quick Actions
+            </div>
+            <div class="info-card-body">
+                <div class="action-buttons">
+                    {% if not guest.officer_send_invite %}
+                    <a href="{% url 'officer_send_invite' guest.id %}" 
+                       class="btn btn-primary mb-2">
+                        <i class="fas fa-paper-plane me-2"></i> Send Invitation
+                    </a>
+                    {% else %}
+                    <a href="{% url 'officer_resend_invite' guest.id %}" 
+                       class="btn btn-outline-primary mb-2">
+                        <i class="fas fa-redo me-2"></i> Resend Invitation
+                    </a>
+                    {% endif %}
+                    
+                    {% if not guest.confirmed %}
+                    <form method="post" action="{% url 'check_in' guest.id %}">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                class="btn btn-success mb-2 w-100"
+                                onclick="return confirm('Mark {{ guest.full_name|escapejs }} as confirmed?')">
+                            <i class="fas fa-check-circle me-2"></i> Mark as Confirmed
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <a href="{% url 'download_invitation' guest.id %}" 
+                       class="btn btn-info mb-2">
+                        <i class="fas fa-download me-2"></i> Download Invitation
+                    </a>
+                    
+                    <a href="mailto:{{ guest.email }}" 
+                       class="btn btn-outline-secondary mb-2">
+                        <i class="fas fa-envelope me-2"></i> Send Email
+                    </a>
+                    
+<div class="action-buttons">
+    {% if whatsapp_link %}
+    <a href="{{ whatsapp_link }}" target="_blank"
+       class="btn btn-success mb-2">
+        <i class="fab fa-whatsapp me-2"></i> Send WhatsApp Invitation
+    </a>
+    {% else %}
+    <button class="btn btn-secondary mb-2" disabled>
+        <i class="fab fa-whatsapp me-2"></i> WhatsApp Not Available
+    </button>
+    {% endif %}
+</div>
+
+                    
+                    <a href="{% url 'event_guests' event.id %}" 
+                       class="btn btn-outline-dark mb-2">
+                        <i class="fas fa-arrow-left me-2"></i> Back to Guests
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Code -->
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fas fa-qrcode me-2"></i> QR Code
+            </div>
+            <div class="info-card-body">
+                <div class="qr-container">
+                    {% if guest.qr_code %}
+                    <!-- Display QR code if available -->
+                    <div id="qrcode" class="mb-3"></div>
+                    <p class="small text-muted mb-2">Scan to check-in</p>
+                    <p class="small text-muted">Code: {{ guest.qr_code }}</p>
+                    
+                    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+                    <script>
+                        // Generate QR code
+                        QRCode.toCanvas(document.getElementById('qrcode'), 
+                            '{{ guest.qr_code }}',
+                            { width: 150, margin: 1 },
+                            function (error) {
+                                if (error) console.error(error);
+                            }
+                        );
+                    </script>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-qrcode fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-2">QR Code not generated</p>
+                        <button class="btn btn-sm btn-outline-primary">
+                            Generate QR Code
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Guest Notes -->
+        {% if guest.notes %}
+        <div class="info-card mt-4">
+            <div class="info-card-header">
+                <i class="fas fa-sticky-note me-2"></i> Notes
+            </div>
+            <div class="info-card-body">
+                <p class="mb-0">{{ guest.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

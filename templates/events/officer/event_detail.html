@@ -1,0 +1,30 @@
+<h2>{{ event.title }}</h2>
+<p>{{ event.date }} | {{ event.venue }}</p>
+
+<a href="{% url 'officer_add_guest' event.id %}">➕ Add Guest</a>
+
+<table border="1">
+<tr>
+  <th>Name</th>
+  <th>Email</th>
+  <th>Card</th>
+  <th>Send</th>
+</tr>
+
+{% for guest in guests %}
+<tr>
+  <td>{{ guest.full_name }}</td>
+  <td>{{ guest.email }}</td>
+  <td>
+    {% if guest.invitation_card %}
+      <a href="{{ guest.invitation_card.url }}">View Card</a>
+    {% else %}
+      Not generated
+    {% endif %}
+  </td>
+  <td>
+    <a href="{% url 'officer_send_invite' guest.id %}">Send</a>
+  </td>
+</tr>
+{% endfor %}
+</table>
